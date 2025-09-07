@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -16,19 +15,9 @@ class OnboardingController extends GetxController {
 
   Future<void> loadOnboardingData() async {
     try {
-      final String jsonString = await rootBundle.loadString(
-        'assets/onboarding_data.json',
-      );
-      final Map<String, dynamic> jsonData = json.decode(jsonString);
-
-      // Extract onboarding screens from JSON
-      if (jsonData.containsKey('onboarding')) {
-        onboardingData.value = List<Map<String, dynamic>>.from(
-          jsonData['onboarding'],
-        );
-      } else {
-        _setDefaultOnboardingData();
-      }
+      // Load the Lottie animation file to ensure it exists
+      await rootBundle.loadString('assets/Kids Learning From Home.json');
+      _setDefaultOnboardingData();
     } catch (e) {
       print('Error loading onboarding data: $e');
       _setDefaultOnboardingData();

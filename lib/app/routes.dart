@@ -5,7 +5,7 @@ import '../controllers/auth_controller.dart';
 import '../controllers/homework_controller.dart';
 import '../views/onboarding/onboarding_screen.dart';
 import '../views/auth/login_screen.dart';
-import '../views/auth/register_screen.dart';
+import '../views/auth/register_page.dart';
 import '../views/homework/homework_list.dart';
 import '../views/profile/profile_screen.dart';
 
@@ -33,7 +33,7 @@ class AppRoutes {
     ),
     GetPage(
       name: '/register',
-      page: () => RegisterScreen(),
+      page: () => const RegisterPage(),
       binding: BindingsBuilder(() {
         Get.lazyPut(() => AuthController());
       }),

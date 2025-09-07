@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../controllers/homework_controller.dart';
 import '../../models/homework_model.dart';
 import '../../utils/validators.dart';
+import '../../app/themes.dart';
 
 class AddHomeworkBottomSheet extends StatefulWidget {
   @override
@@ -21,176 +22,351 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 20,
-        right: 20,
-        top: 20,
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        color: Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
+        boxShadow: [
+          BoxShadow(
+            color: AppThemes.color1.withOpacity(0.1),
+            blurRadius: 20,
+            offset: Offset(0, -5),
+          ),
+        ],
       ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Handle bar
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Title
-            Text(
-              'Add New Homework',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: 24),
-
-            // Title field
-            TextFormField(
-              controller: _titleController,
-              validator: (value) => Validators.validateRequired(value, 'Title'),
-              decoration: InputDecoration(
-                labelText: 'Homework Title *',
-                prefixIcon: const Icon(Icons.assignment),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                hintText: 'e.g., Math Assignment Chapter 5',
-              ),
-              textCapitalization: TextCapitalization.sentences,
-            ),
-
-            const SizedBox(height: 16),
-
-            // Description field
-            TextFormField(
-              controller: _descriptionController,
-              maxLines: 3,
-              decoration: InputDecoration(
-                labelText: 'Description (Optional)',
-                prefixIcon: const Icon(Icons.description),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                hintText: 'Add any additional details...',
-              ),
-              textCapitalization: TextCapitalization.sentences,
-            ),
-
-            const SizedBox(height: 16),
-
-            // Date picker
-            Obx(
-              () => InkWell(
-                onTap: () => _selectDate(context),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+          left: 24,
+          right: 24,
+          top: 20,
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Handle bar
+              Center(
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  width: 50,
+                  height: 5,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Due Date',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
-                          ),
-                          Text(
-                            DateFormat(
-                              'MMM dd, yyyy',
-                            ).format(selectedDate.value),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      Icon(Icons.arrow_drop_down, color: Colors.grey.shade600),
-                    ],
+                    color: AppThemes.color1.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(3),
                   ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-            // Action buttons
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Get.back(),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+              // Title
+              Text(
+                'Add New Homework',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: AppThemes.color1,
+                  letterSpacing: 0.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 8),
+
+              Text(
+                'Create a new homework assignment',
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: 32),
+
+              // Title field
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppThemes.color1.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: TextFormField(
+                  controller: _titleController,
+                  validator: (value) =>
+                      Validators.validateRequired(value, 'Title'),
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  decoration: InputDecoration(
+                    labelText: 'Homework Title *',
+                    labelStyle: TextStyle(color: AppThemes.color1),
+                    prefixIcon: Icon(
+                      Icons.assignment_outlined,
+                      color: AppThemes.color1,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: AppThemes.color1.withOpacity(0.3),
                       ),
                     ),
-                    child: const Text('Cancel'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Obx(
-                    () => ElevatedButton(
-                      onPressed: controller.isLoading.value
-                          ? null
-                          : _saveHomework,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: AppThemes.color1.withOpacity(0.3),
                       ),
-                      child: controller.isLoading.value
-                          ? SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppThemes.color1, width: 2),
+                    ),
+                    hintText: 'e.g., Math Assignment Chapter 5',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Description field
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppThemes.color1.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: TextFormField(
+                  controller: _descriptionController,
+                  maxLines: 3,
+                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  decoration: InputDecoration(
+                    labelText: 'Description (Optional)',
+                    labelStyle: TextStyle(color: AppThemes.color1),
+                    prefixIcon: Icon(
+                      Icons.description_outlined,
+                      color: AppThemes.color1,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: AppThemes.color1.withOpacity(0.3),
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(
+                        color: AppThemes.color1.withOpacity(0.3),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppThemes.color1, width: 2),
+                    ),
+                    hintText: 'Add any additional details...',
+                    hintStyle: TextStyle(color: Colors.grey[400]),
+                    filled: true,
+                    fillColor: Colors.white,
+                  ),
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Date picker
+              Obx(
+                () => InkWell(
+                  onTap: () => _selectDate(context),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(
+                        color: AppThemes.color1.withOpacity(0.3),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppThemes.color1.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppThemes.color1.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(
+                            Icons.calendar_today_outlined,
+                            color: AppThemes.color1,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Due Date',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: AppThemes.color1,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            )
-                          : const Text('Save Homework'),
+                              const SizedBox(height: 4),
+                              Text(
+                                DateFormat(
+                                  'EEEE, MMM dd, yyyy',
+                                ).format(selectedDate.value),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward_ios,
+                          color: AppThemes.color1,
+                          size: 16,
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
 
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 32),
+
+              // Action buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 55,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: AppThemes.color1.withOpacity(0.3),
+                          width: 2,
+                        ),
+                      ),
+                      child: OutlinedButton(
+                        onPressed: () => Get.back(),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide.none,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppThemes.color1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 2,
+                    child: Obx(
+                      () => Container(
+                        height: 55,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [AppThemes.color1, AppThemes.color2],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppThemes.color1.withOpacity(0.3),
+                              blurRadius: 15,
+                              offset: Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: controller.isLoading.value
+                              ? null
+                              : _saveHomework,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          child: controller.isLoading.value
+                              ? SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.save_outlined,
+                                      color: Colors.white,
+                                      size: 20,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Save Homework',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
@@ -205,9 +381,15 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(
-              context,
-            ).colorScheme.copyWith(primary: Theme.of(context).primaryColor),
+            colorScheme: ColorScheme.light(
+              primary: AppThemes.color1,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black87,
+            ),
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(foregroundColor: AppThemes.color1),
+            ),
           ),
           child: child!,
         );
@@ -235,7 +417,8 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
       // Show loading and wait for completion
       try {
         await controller.addHomework(homework);
-        // Only close if successful (no exception thrown)
+        // Wait a moment to show success message, then close
+        await Future.delayed(Duration(milliseconds: 800));
         if (Get.isBottomSheetOpen ?? false) {
           Get.back();
         }

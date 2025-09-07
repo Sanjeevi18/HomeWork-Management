@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 import '../../controllers/onboarding_controller.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -21,6 +22,7 @@ class OnboardingScreen extends StatelessWidget {
                 controller: pageController,
                 onPageChanged: (index) => controller.goToPage(index),
                 itemCount: controller.onboardingData.length,
+                physics: PageScrollPhysics(), // Only allow swipe, disable tap
                 itemBuilder: (context, index) {
                   final data = controller.onboardingData[index];
                   return OnboardingPage(
@@ -190,21 +192,41 @@ class _OnboardingPageState extends State<OnboardingPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Animated Icon
+            // Animated Icon or Lottie Animation
             ScaleTransition(
               scale: _bounceAnimation,
               child: Container(
                 width: 200,
                 height: 200,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  color: widget.isGetStarted
+                      ? Colors.transparent
+                      : Theme.of(context).primaryColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  _getIconData(widget.icon),
-                  size: 100,
-                  color: Theme.of(context).primaryColor,
-                ),
+                child: widget.isGetStarted
+                    ? Lottie.asset(
+                        'assets/Kids Learning From Home.json',
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.contain,
+                        repeat: true,
+                        animate: true,
+                      )
+                    : TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: Duration(milliseconds: 800),
+                        builder: (context, value, child) {
+                          return Transform.rotate(
+                            angle: widget.isAnimated ? value * 0.1 : 0,
+                            child: Icon(
+                              _getIconData(widget.icon),
+                              size: 100,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          );
+                        },
+                      ),
               ),
             ),
 

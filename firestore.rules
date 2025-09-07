@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only access their own data
+    match /users/{userId} {
+      // Allow authenticated users to read and write their own user document
+      allow read, write, create: if request.auth != null && request.auth.uid == userId;
+      
+      // Allow access to homework subcollection for authenticated users
+      match /homeworks/{homeworkId} {
+        allow read, write, create, delete: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+    
+    // Allow authenticated users to read connectivity test collection
+    match /_connectivity_test/{testId} {
+      allow read: if request.auth != null;
+    }
+    
+    // Deny all other reads/writes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
