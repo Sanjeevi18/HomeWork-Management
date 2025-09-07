@@ -15,8 +15,8 @@ class HomeworkListScreen extends StatelessWidget {
         title: const Text('My Homework'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => authController.signOut(),
+            icon: const Icon(Icons.person),
+            onPressed: () => Get.toNamed('/profile'),
           ),
         ],
       ),

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
 class AppThemes {
-  // Custom Color Palette
-  static const Color paleCerulean = Color(0xFFA5C8E4); // soft, gentle blue
-  static const Color teaGreen = Color(0xFFC0ECCC); // refreshing minty tone
-  static const Color blond = Color(0xFFF9F0C1); // warm, neutral cream
-  static const Color deepChampagne = Color(0xFFF4CDA6); // subtle peach warmth
-  static const Color mauvelous = Color(0xFFF6A8A6); // mild, calming rose color
+  // Your Custom Color Palette
+  static const Color color1 = Color(0xFFA5C8E4); // Pale blue
+  static const Color color2 = Color(0xFFC0ECCC); // Tea green
+  static const Color color3 = Color(0xFFF9F0C1); // Blond/cream
+  static const Color color4 = Color(0xFFF4CDA6); // Deep champagne
+  static const Color color5 = Color(0xFFF6A8A6); // Mauvelous/rose
 
   static final lightTheme = ThemeData(
     brightness: Brightness.light,
-    primaryColor: paleCerulean,
-    scaffoldBackgroundColor: blond,
+    primaryColor: color1,
+    scaffoldBackgroundColor: Colors.white,
     colorScheme: ColorScheme.light(
-      primary: paleCerulean,
-      secondary: teaGreen,
+      primary: color1,
+      secondary: color2,
       surface: Colors.white,
-      background: blond,
-      error: mauvelous,
+      background: Colors.white,
+      error: color5,
       onPrimary: Colors.white,
       onSecondary: Colors.black87,
       onSurface: Colors.black87,
@@ -32,7 +32,7 @@ class AppThemes {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: paleCerulean,
+        backgroundColor: color1,
         foregroundColor: Colors.white,
         elevation: 2,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -42,15 +42,15 @@ class AppThemes {
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: paleCerulean.withOpacity(0.3)),
+        borderSide: BorderSide(color: color1.withOpacity(0.3)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: paleCerulean.withOpacity(0.3)),
+        borderSide: BorderSide(color: color1.withOpacity(0.3)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: paleCerulean, width: 2),
+        borderSide: const BorderSide(color: color1, width: 2),
       ),
       filled: true,
       fillColor: Colors.white,
@@ -61,21 +61,21 @@ class AppThemes {
       color: Colors.white,
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: teaGreen,
+      backgroundColor: color2,
       foregroundColor: Colors.black87,
     ),
   );
 
   static final darkTheme = ThemeData(
     brightness: Brightness.dark,
-    primaryColor: paleCerulean,
+    primaryColor: color1,
     scaffoldBackgroundColor: const Color(0xFF1E1E1E),
     colorScheme: ColorScheme.dark(
-      primary: paleCerulean,
-      secondary: teaGreen,
+      primary: color1,
+      secondary: color2,
       surface: const Color(0xFF2D2D2D),
       background: const Color(0xFF1E1E1E),
-      error: mauvelous,
+      error: color5,
       onPrimary: Colors.black87,
       onSecondary: Colors.black87,
       onSurface: Colors.white,
@@ -90,7 +90,7 @@ class AppThemes {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: paleCerulean,
+        backgroundColor: color1,
         foregroundColor: Colors.black87,
         elevation: 2,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -100,15 +100,15 @@ class AppThemes {
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: paleCerulean.withOpacity(0.3)),
+        borderSide: BorderSide(color: color1.withOpacity(0.3)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: paleCerulean.withOpacity(0.3)),
+        borderSide: BorderSide(color: color1.withOpacity(0.3)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: paleCerulean, width: 2),
+        borderSide: const BorderSide(color: color1, width: 2),
       ),
       filled: true,
       fillColor: const Color(0xFF2D2D2D),
@@ -119,7 +119,7 @@ class AppThemes {
       color: const Color(0xFF2D2D2D),
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: teaGreen,
+      backgroundColor: color2,
       foregroundColor: Colors.black87,
     ),
   );

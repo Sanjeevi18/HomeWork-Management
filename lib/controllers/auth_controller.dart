@@ -44,6 +44,8 @@ class AuthController extends GetxController {
         'Logged in successfully!',
         snackPosition: SnackPosition.BOTTOM,
       );
+      // Auto-navigate to home after successful login
+      Get.offAllNamed('/home');
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
         'Error',
@@ -70,6 +72,8 @@ class AuthController extends GetxController {
         'Account created successfully!',
         snackPosition: SnackPosition.BOTTOM,
       );
+      // Auto-navigate to home after successful signup
+      Get.offAllNamed('/home');
     } on FirebaseAuthException catch (e) {
       Get.snackbar(
         'Error',

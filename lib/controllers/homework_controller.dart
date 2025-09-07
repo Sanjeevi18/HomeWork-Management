@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import '../models/homework_model.dart';
 
 class HomeworkController extends GetxController {
@@ -21,13 +22,34 @@ class HomeworkController extends GetxController {
   CollectionReference get _homeworkCollection =>
       _firestore.collection('users').doc(_userId).collection('homeworks');
 
+  // Test Firebase connectivity
+  Future<bool> testFirebaseConnection() async {
+    try {
+      await _firestore.enableNetwork();
+      // Test if we can read/write to Firestore
+      await _firestore.collection('test').doc('connection_test').set({
+        'timestamp': Timestamp.now(),
+        'userId': _userId,
+      });
+      // Clean up test document
+      await _firestore.collection('test').doc('connection_test').delete();
+      return true;
+    } catch (e) {
+      print('Firebase connection test failed: $e');
+      return false;
+    }
+  }
+
   int get pendingCount => homeworkList.where((h) => !h.isCompleted).length;
   int get completedCount => homeworkList.where((h) => h.isCompleted).length;
   double get progressPercent =>
       homeworkList.isEmpty ? 0 : completedCount / homeworkList.length;
 
   Future<void> loadHomework() async {
-    if (_userId == null) return;
+    if (_userId == null) {
+      print('User not authenticated');
+      return;
+    }
 
     try {
       isLoading.value = true;
@@ -35,30 +57,100 @@ class HomeworkController extends GetxController {
           .orderBy('createdAt', descending: true)
           .snapshots()
           .listen((snapshot) {
-            homeworkList.value = snapshot.docs
-                .map(
-                  (doc) => HomeworkModel.fromMap(
-                    doc.data() as Map<String, dynamic>,
-                    doc.id,
-                  ),
-                )
-                .toList();
+            try {
+              homeworkList.value = snapshot.docs
+                  .map(
+                    (doc) => HomeworkModel.fromMap(
+                      doc.data() as Map<String, dynamic>,
+                      doc.id,
+                    ),
+                  )
+                  .toList();
+            } catch (e) {
+              print('Error parsing homework data: $e');
+              Get.snackbar('Error', 'Failed to load homework data');
+            }
           });
     } catch (e) {
-      Get.snackbar('Error', 'Failed to load homework: $e');
+      print('Firestore loadHomework Error: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to load homework. Please check your internet connection.',
+      );
     } finally {
       isLoading.value = false;
     }
   }
 
   Future<void> addHomework(HomeworkModel homework) async {
-    if (_userId == null) return;
+    if (_userId == null) {
+      Get.snackbar('Error', 'Please login first');
+      return;
+    }
+
+    // Check if user is still authenticated
+    if (_auth.currentUser == null) {
+      Get.snackbar('Error', 'Session expired. Please login again.');
+      return;
+    }
 
     try {
-      await _homeworkCollection.add(homework.toMap());
-      Get.snackbar('Success', 'Homework added successfully!');
+      isLoading.value = true;
+
+      // Test Firebase connection first
+      bool isConnected = await testFirebaseConnection();
+      if (!isConnected) {
+        throw Exception('No internet connection or Firebase unavailable');
+      }
+
+      // Create a map without the id field since Firestore will generate it
+      final homeworkData = {
+        'title': homework.title,
+        'description': homework.description,
+        'dueDate': Timestamp.fromDate(homework.dueDate),
+        'isCompleted': homework.isCompleted,
+        'createdAt': Timestamp.fromDate(homework.createdAt),
+      };
+
+      print('Adding homework for user: $_userId'); // Debug log
+      print('Homework data: $homeworkData'); // Debug log
+
+      await _homeworkCollection.add(homeworkData);
+      Get.snackbar(
+        'Success',
+        'Homework added successfully!',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to add homework: $e');
+      print('Firestore Error: $e'); // Debug log
+      String errorMessage = 'Failed to add homework. ';
+
+      if (e.toString().toLowerCase().contains('network') ||
+          e.toString().toLowerCase().contains('unavailable') ||
+          e.toString().toLowerCase().contains('internet')) {
+        errorMessage += 'Please check your internet connection and try again.';
+      } else if (e.toString().toLowerCase().contains('permission') ||
+          e.toString().toLowerCase().contains('denied')) {
+        errorMessage +=
+            'Permission denied. Please try logging out and back in.';
+      } else if (e.toString().toLowerCase().contains('quota')) {
+        errorMessage += 'Storage quota exceeded.';
+      } else if (e.toString().toLowerCase().contains('timeout')) {
+        errorMessage += 'Request timed out. Please try again.';
+      } else {
+        errorMessage += 'Please try again later. Error: ${e.toString()}';
+      }
+
+      Get.snackbar(
+        'Network Error',
+        errorMessage,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: Duration(seconds: 5),
+      );
+    } finally {
+      isLoading.value = false;
     }
   }
 

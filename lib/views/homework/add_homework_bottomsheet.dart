@@ -158,17 +158,32 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: _saveHomework,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).primaryColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                  child: Obx(
+                    () => ElevatedButton(
+                      onPressed: controller.isLoading.value
+                          ? null
+                          : _saveHomework,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
+                      child: controller.isLoading.value
+                          ? SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            )
+                          : const Text('Save Homework'),
                     ),
-                    child: const Text('Save Homework'),
                   ),
                 ),
               ],
@@ -204,7 +219,7 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
     }
   }
 
-  void _saveHomework() {
+  void _saveHomework() async {
     if (_formKey.currentState!.validate()) {
       final homework = HomeworkModel(
         id: '', // Firestore will generate this
@@ -217,8 +232,17 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
         createdAt: DateTime.now(),
       );
 
-      controller.addHomework(homework);
-      Get.back();
+      // Show loading and wait for completion
+      try {
+        await controller.addHomework(homework);
+        // Only close if successful (no exception thrown)
+        if (Get.isBottomSheetOpen ?? false) {
+          Get.back();
+        }
+      } catch (e) {
+        // Error handling is done in the controller
+        print('Error in _saveHomework: $e');
+      }
     }
   }
 }
