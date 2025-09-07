@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../models/homework_model.dart';
-import 'auth_controller.dart';
+import '../app/themes.dart';
 
 class HomeworkController extends GetxController {
   var homeworkList = <HomeworkModel>[].obs;
@@ -15,7 +15,12 @@ class HomeworkController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadHomework();
+    // Add a small delay before loading homework to allow auth state to stabilize
+    Future.delayed(Duration(milliseconds: 2000), () {
+      if (_userId != null) {
+        loadHomework();
+      }
+    });
   }
 
   String? get _userId => _auth.currentUser?.uid;
@@ -125,10 +130,7 @@ class HomeworkController extends GetxController {
 
   Future<void> loadHomework() async {
     if (_userId == null) {
-      print('User not authenticated');
-      // Use auth controller to properly reset auth state
-      final AuthController authController = Get.find<AuthController>();
-      authController.resetAuthState();
+      print('User not authenticated - waiting for auth state to stabilize');
       return;
     }
 
@@ -164,12 +166,13 @@ class HomeworkController extends GetxController {
                     .toList();
               } catch (e) {
                 print('Error parsing homework data: $e');
-                Get.snackbar(
-                  'Error',
-                  'Failed to load homework data: ${e.toString()}',
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                );
+                // Remove snackbar to avoid showing error after successful login
+                // Get.snackbar(
+                //   'Error',
+                //   'Failed to load homework data: ${e.toString()}',
+                //   backgroundColor: Colors.red,
+                //   colorText: Colors.white,
+                // );
               }
             },
             onError: (error) {
@@ -177,28 +180,26 @@ class HomeworkController extends GetxController {
               isLoading.value = false;
 
               if (error.toString().contains('permission-denied')) {
-                // Use auth controller to properly reset auth state
-                final AuthController authController =
-                    Get.find<AuthController>();
-                authController.resetAuthState();
+                // Only reset auth state if user is actually null and it's been a while
+                Future.delayed(Duration(seconds: 10), () {
+                  if (_auth.currentUser == null &&
+                      Get.currentRoute != '/login') {
+                    print('Permission denied - user appears to be logged out');
+                    // Don't show error message, just silently redirect to login
+                    Get.offAllNamed('/login');
+                  }
+                });
               } else {
-                Get.snackbar(
-                  'Connection Error',
-                  'Failed to sync homework. Using cached data if available.',
-                  backgroundColor: Colors.orange,
-                  colorText: Colors.white,
-                );
+                // Don't show connection errors during login flow
+                // Only log them for debugging
+                print('Connection error (not showing snackbar): $error');
               }
             },
           );
     } catch (e) {
       print('Firestore loadHomework Error: $e');
-      Get.snackbar(
-        'Error',
-        'Failed to load homework. Please check your internet connection.',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      // Don't show error messages during normal login flow
+      // Only log them for debugging purposes
     } finally {
       isLoading.value = false;
     }
@@ -256,12 +257,27 @@ class HomeworkController extends GetxController {
 
         // Success!
         isLoading.value = false; // Reset loading state on success
+
+        // Close any open dialogs/bottom sheets and navigate to homework list
+        if (Get.isBottomSheetOpen ?? false) {
+          Get.back();
+        }
+
+        // Ensure we're on the homework list screen
+        Get.offAllNamed('/home');
+
+        // Reload homework list to show the new homework
+        await loadHomework();
+
+        // Show success message
         Get.snackbar(
           'Success',
           'Homework added successfully!',
           backgroundColor: Colors.green,
           colorText: Colors.white,
+          duration: Duration(seconds: 2),
         );
+
         return; // Exit the retry loop on success
       } catch (e) {
         print('Attempt $attempt failed: $e');
@@ -319,7 +335,42 @@ class HomeworkController extends GetxController {
 
     try {
       await _homeworkCollection.doc(id).update({'isCompleted': true});
-      Get.snackbar('Great!', 'Homework marked as completed! 🎉');
+      Get.snackbar(
+        'Great!',
+        'Homework marked as completed! 🎉',
+        backgroundColor: AppThemes.color2,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: Duration(seconds: 3),
+        mainButton: TextButton(
+          onPressed: () {
+            Get.closeCurrentSnackbar();
+            markAsPending(id);
+          },
+          child: Text(
+            'UNDO',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to update homework: $e');
+    }
+  }
+
+  Future<void> markAsPending(String id) async {
+    if (_userId == null) return;
+
+    try {
+      await _homeworkCollection.doc(id).update({'isCompleted': false});
+      Get.snackbar(
+        'Undone',
+        'Homework marked as pending',
+        backgroundColor: AppThemes.color1,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+        duration: Duration(seconds: 2),
+      );
     } catch (e) {
       Get.snackbar('Error', 'Failed to update homework: $e');
     }
@@ -340,10 +391,40 @@ class HomeworkController extends GetxController {
     if (_userId == null) return;
 
     try {
-      await _homeworkCollection.doc(id).update(updates);
-      Get.snackbar('Updated', 'Homework updated successfully');
+      // Convert DateTime to Timestamp if present
+      Map<String, dynamic> processedUpdates = Map.from(updates);
+      if (processedUpdates.containsKey('dueDate') &&
+          processedUpdates['dueDate'] is DateTime) {
+        processedUpdates['dueDate'] = Timestamp.fromDate(
+          processedUpdates['dueDate'],
+        );
+      }
+
+      await _homeworkCollection.doc(id).update(processedUpdates);
+      Get.snackbar(
+        'Updated',
+        'Homework updated successfully',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
     } catch (e) {
-      Get.snackbar('Error', 'Failed to update homework: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to update homework: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  // Clear all homework data (used during logout)
+  void clearData() {
+    try {
+      homeworkList.clear();
+      isLoading.value = false;
+      print('Homework data cleared');
+    } catch (e) {
+      print('Error clearing homework data: $e');
     }
   }
 }

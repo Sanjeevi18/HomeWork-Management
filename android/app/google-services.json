@@ -12,7 +12,20 @@
           "package_name": "com.example.homework"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "852177832034-e0l16ggg55ae386m1hlktoditqorki2s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.homework",
+            "certificate_hash": "2f2fdbea33fa4a7048ce41daffe1df9a5566d249"
+          }
+        },
+        {
+          "client_id": "852177832034-jvlemof3ikh49g7sdddddvr459rqj6cn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDEsI2azvQ1DVxRLMAU-X0L65w2FJXrLoM"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "852177832034-jvlemof3ikh49g7sdddddvr459rqj6cn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "852177832034-8fdk88ftcqskg24b0a23h2a4diur2dq0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.homework"
+              }
+            }
+          ]
         }
       }
     }

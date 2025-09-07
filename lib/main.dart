@@ -27,8 +27,6 @@ class MyApp extends StatelessWidget {
       title: 'Homework Manager',
       debugShowCheckedModeBanner: false,
       theme: AppThemes.lightTheme,
-      darkTheme: AppThemes.darkTheme,
-      themeMode: ThemeMode.system,
       initialRoute: AppRoutes.initial,
       getPages: AppRoutes.pages,
     );

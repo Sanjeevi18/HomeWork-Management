@@ -1,21 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/auth_controller.dart';
+import '../../controllers/profile_controller.dart';
 import '../../app/themes.dart';
 
 class ProfileScreen extends StatelessWidget {
   final AuthController authController = Get.find();
+  final ProfileController profileController = Get.put(ProfileController());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'Profile',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).appBarTheme.foregroundColor,
+          ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppThemes.color1),
@@ -76,13 +81,14 @@ class ProfileScreen extends StatelessWidget {
                   const SizedBox(height: 16),
 
                   // User Email or Name placeholder
-                  Text(
-                    authController.currentUser?.email?.split('@')[0] ??
-                        'Student',
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  Obx(
+                    () => Text(
+                      profileController.displayName,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
 
@@ -105,42 +111,48 @@ class ProfileScreen extends StatelessWidget {
             _buildSectionTitle('Personal Information'),
             const SizedBox(height: 16),
 
-            _buildInfoCard(
-              icon: Icons.person_outline,
-              title: 'Full Name',
-              value:
-                  authController.currentUser?.displayName ??
-                  authController.currentUser?.email?.split('@')[0] ??
-                  'Not set',
-              color: AppThemes.color1,
-              isEditable: true,
-              onEdit: () => _showEditDialog('Name', 'Enter your full name'),
-            ),
+            Obx(
+              () => Column(
+                children: [
+                  _buildInfoCard(
+                    icon: Icons.person_outline,
+                    title: 'Full Name',
+                    value: profileController.displayName,
+                    color: AppThemes.color1,
+                    isEditable: true,
+                    onEdit: () => _showEditDialog(
+                      'Name',
+                      'Enter your full name',
+                      'fullName',
+                    ),
+                  ),
 
-            const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-            _buildInfoCard(
-              icon: Icons.cake_outlined,
-              title: 'Date of Birth',
-              value:
-                  'Not set', // This would be from a user collection in Firestore
-              color: AppThemes.color2,
-              isEditable: true,
-              onEdit: () => _showDatePicker(context),
-            ),
+                  _buildInfoCard(
+                    icon: Icons.cake_outlined,
+                    title: 'Date of Birth',
+                    value: profileController.displayDateOfBirth,
+                    color: AppThemes.color2,
+                    isEditable: true,
+                    onEdit: () => _showDatePicker(context),
+                  ),
 
-            const SizedBox(height: 12),
+                  const SizedBox(height: 12),
 
-            _buildInfoCard(
-              icon: Icons.school_outlined,
-              title: 'School/College',
-              value:
-                  'Not set', // This would be from a user collection in Firestore
-              color: AppThemes.color4,
-              isEditable: true,
-              onEdit: () => _showEditDialog(
-                'School/College',
-                'Enter your school or college name',
+                  _buildInfoCard(
+                    icon: Icons.school_outlined,
+                    title: 'School/College',
+                    value: profileController.displaySchool,
+                    color: AppThemes.color4,
+                    isEditable: true,
+                    onEdit: () => _showEditDialog(
+                      'School/College',
+                      'Enter your school or college name',
+                      'school',
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -347,7 +359,7 @@ class ProfileScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(Get.context!).cardColor,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: color.withOpacity(0.2)),
         boxShadow: [
@@ -377,7 +389,9 @@ class ProfileScreen extends StatelessWidget {
                   title,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey[600],
+                    color: Theme.of(
+                      Get.context!,
+                    ).textTheme.bodyMedium?.color?.withOpacity(0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -388,8 +402,10 @@ class ProfileScreen extends StatelessWidget {
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: value == 'Not set'
-                        ? Colors.grey[500]
-                        : Colors.black87,
+                        ? Theme.of(
+                            Get.context!,
+                          ).textTheme.bodyMedium?.color?.withOpacity(0.5)
+                        : Theme.of(Get.context!).textTheme.bodyLarge?.color,
                   ),
                 ),
               ],
@@ -414,7 +430,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showEditDialog(String field, String hint) {
+  void _showEditDialog(String field, String hint, String fieldType) {
     final TextEditingController controller = TextEditingController();
 
     Get.dialog(
@@ -522,19 +538,33 @@ class ProfileScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Here you would typically save to Firestore user collection
-                      Get.back();
-                      Get.snackbar(
-                        '✅ Updated',
-                        '$field has been updated successfully!',
-                        backgroundColor: AppThemes.color2,
-                        colorText: Colors.white,
-                        snackPosition: SnackPosition.TOP,
-                        margin: EdgeInsets.all(16),
-                        borderRadius: 12,
-                        duration: Duration(seconds: 2),
-                      );
+                    onPressed: () async {
+                      String value = controller.text.trim();
+                      if (value.isNotEmpty) {
+                        Get.back();
+
+                        // Update the profile based on field type
+                        if (fieldType == 'fullName') {
+                          await profileController.updateUserProfile(
+                            newFullName: value,
+                          );
+                        } else if (fieldType == 'school') {
+                          await profileController.updateUserProfile(
+                            newSchool: value,
+                          );
+                        }
+
+                        Get.snackbar(
+                          '✅ Updated',
+                          '$field has been updated successfully!',
+                          backgroundColor: AppThemes.color2,
+                          colorText: Colors.white,
+                          snackPosition: SnackPosition.TOP,
+                          margin: EdgeInsets.all(16),
+                          borderRadius: 12,
+                          duration: Duration(seconds: 2),
+                        );
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppThemes.color1,
@@ -695,10 +725,18 @@ class ProfileScreen extends StatelessWidget {
       );
 
       if (selectedDate != null) {
-        // Here you would typically save to Firestore user collection
+        // Format the date for display and storage
+        String formattedDate =
+            '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}';
+
+        // Update the profile with the new date
+        await profileController.updateUserProfile(
+          newDateOfBirth: formattedDate,
+        );
+
         Get.snackbar(
           '🎂 Date Updated',
-          'Date of birth set to ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+          'Date of birth set to $formattedDate',
           backgroundColor: AppThemes.color2,
           colorText: Colors.white,
           snackPosition: SnackPosition.TOP,

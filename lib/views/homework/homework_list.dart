@@ -4,6 +4,7 @@ import '../../controllers/auth_controller.dart';
 import '../../controllers/homework_controller.dart';
 import '../../app/themes.dart';
 import 'add_homework_bottomsheet.dart';
+import 'homework_details_bottomsheet.dart';
 
 class HomeworkListScreen extends StatelessWidget {
   final AuthController authController = Get.find();
@@ -253,9 +254,7 @@ class HomeworkListScreen extends StatelessWidget {
                                     : null,
                               ),
                               child: Icon(
-                                homework.isCompleted
-                                    ? Icons.check_circle
-                                    : Icons.radio_button_unchecked,
+                                Icons.assignment,
                                 color: homework.isCompleted
                                     ? AppThemes.color2
                                     : AppThemes.color1,
@@ -330,21 +329,71 @@ class HomeworkListScreen extends StatelessWidget {
                                 ],
                               ],
                             ),
-                            trailing: IconButton(
-                              icon: Icon(
-                                Icons.delete_outline,
-                                color: AppThemes.color5,
-                              ),
-                              onPressed: () => homeworkController
-                                  .deleteHomework(homework.id),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Completion checkbox - ONLY way to mark complete
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: homework.isCompleted
+                                        ? AppThemes.color2.withOpacity(0.1)
+                                        : Colors.grey[50],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: homework.isCompleted
+                                          ? AppThemes.color2
+                                          : Colors.grey[300]!,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: IconButton(
+                                    icon: Icon(
+                                      homework.isCompleted
+                                          ? Icons.check_box
+                                          : Icons.check_box_outline_blank,
+                                      color: homework.isCompleted
+                                          ? AppThemes.color2
+                                          : Colors.grey[600],
+                                      size: 20,
+                                    ),
+                                    onPressed: () {
+                                      if (homework.isCompleted) {
+                                        homeworkController.markAsPending(
+                                          homework.id,
+                                        );
+                                      } else {
+                                        homeworkController.markAsCompleted(
+                                          homework.id,
+                                        );
+                                      }
+                                    },
+                                    tooltip: homework.isCompleted
+                                        ? 'Mark as incomplete'
+                                        : 'Mark as completed',
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                // Delete button
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete_outline,
+                                    color: AppThemes.color5,
+                                  ),
+                                  onPressed: () => homeworkController
+                                      .deleteHomework(homework.id),
+                                  tooltip: 'Delete homework',
+                                ),
+                              ],
                             ),
-                            onTap: homework.isCompleted
-                                ? null
-                                : () {
-                                    homeworkController.markAsCompleted(
-                                      homework.id,
-                                    );
-                                  },
+                            onTap: () {
+                              // Show homework details - does NOT affect completion status
+                              // Only the checkbox can mark homework as complete/incomplete
+                              Get.bottomSheet(
+                                HomeworkDetailsBottomSheet(homework: homework),
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                              );
+                            },
                           ),
                         );
                       },

@@ -42,4 +42,16 @@ class Validators {
     }
     return null;
   }
+
+  static String? validateName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Name is required';
+    }
+
+    if (value.trim().length < 2) {
+      return 'Name must be at least 2 characters';
+    }
+
+    return null;
+  }
 }

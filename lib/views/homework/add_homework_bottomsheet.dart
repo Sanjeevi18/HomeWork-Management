@@ -414,18 +414,8 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
         createdAt: DateTime.now(),
       );
 
-      // Show loading and wait for completion
-      try {
-        await controller.addHomework(homework);
-        // Wait a moment to show success message, then close
-        await Future.delayed(Duration(milliseconds: 800));
-        if (Get.isBottomSheetOpen ?? false) {
-          Get.back();
-        }
-      } catch (e) {
-        // Error handling is done in the controller
-        print('Error in _saveHomework: $e');
-      }
+      // Add homework - the controller will handle loading states and closing the bottom sheet
+      await controller.addHomework(homework);
     }
   }
 }

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'homework_controller.dart';
 
 class AuthController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -172,13 +173,16 @@ class AuthController extends GetxController {
       );
     } catch (e) {
       print('General login error: $e');
-      Get.snackbar(
-        'Error',
-        'Something went wrong. Please try again.',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      // Only show error if it's not a normal logout/login transition
+      if (Get.currentRoute != '/login') {
+        Get.snackbar(
+          'Error',
+          'Login failed. Please check your credentials and try again.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
     } finally {
       isLoading.value = false;
     }
@@ -290,6 +294,17 @@ class AuthController extends GetxController {
   Future<void> signOut() async {
     try {
       isLoading.value = true;
+
+      // Clear homework data first to prevent permission errors
+      try {
+        if (Get.isRegistered<HomeworkController>()) {
+          final homeworkController = Get.find<HomeworkController>();
+          homeworkController.clearData();
+        }
+      } catch (e) {
+        print('Error clearing homework data: $e');
+      }
+
       await _auth.signOut();
 
       // Clear any cached data
@@ -326,17 +341,11 @@ class AuthController extends GetxController {
       // Small delay to ensure state is cleared
       await Future.delayed(Duration(milliseconds: 500));
 
-      // Navigate to login
+      // Navigate to login silently
       Get.offAllNamed('/login');
 
-      Get.snackbar(
-        'Session Reset',
-        'Please login again to continue',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-        duration: Duration(seconds: 3),
-      );
+      // Don't show snackbar - silent redirect
+      print('Session reset completed - redirected to login');
     } catch (e) {
       print('Error resetting auth state: $e');
     }

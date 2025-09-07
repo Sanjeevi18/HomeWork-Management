@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import '../../controllers/onboarding_controller.dart';
+import '../../app/themes.dart';
 
 class OnboardingScreen extends StatelessWidget {
   final OnboardingController controller = Get.put(OnboardingController());
@@ -10,6 +11,7 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Obx(() {
           if (controller.onboardingData.isEmpty) {
@@ -56,7 +58,7 @@ class OnboardingScreen extends StatelessWidget {
                     child: Text(
                       'Skip',
                       style: TextStyle(
-                        color: Theme.of(context).primaryColor,
+                        color: AppThemes.color1,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -81,8 +83,8 @@ class OnboardingScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
                         color: controller.currentPage.value == index
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey.shade300,
+                            ? AppThemes.color1
+                            : AppThemes.color1.withOpacity(0.3),
                       ),
                     ),
                   ),
@@ -201,7 +203,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                 decoration: BoxDecoration(
                   color: widget.isGetStarted
                       ? Colors.transparent
-                      : Theme.of(context).primaryColor.withOpacity(0.1),
+                      : AppThemes.color1.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
                 child: widget.isGetStarted
@@ -222,7 +224,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                             child: Icon(
                               _getIconData(widget.icon),
                               size: 100,
-                              color: Theme.of(context).primaryColor,
+                              color: AppThemes.color1,
                             ),
                           );
                         },
@@ -243,7 +245,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).primaryColor,
+                  color: AppThemes.color1,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -279,21 +281,38 @@ class _OnboardingPageState extends State<OnboardingPage>
               child: SizedBox(
                 width: double.infinity,
                 height: 56,
-                child: ElevatedButton(
-                  onPressed: widget.isLast ? widget.onFinish : widget.onNext,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppThemes.color1, AppThemes.color2],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
                     ),
-                    elevation: 2,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppThemes.color1.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  child: Text(
-                    widget.isGetStarted ? 'Get Started 🚀' : 'Next',
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
+                  child: ElevatedButton(
+                    onPressed: widget.isLast ? widget.onFinish : widget.onNext,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: Text(
+                      widget.isGetStarted ? 'Get Started 🚀' : 'Next',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
