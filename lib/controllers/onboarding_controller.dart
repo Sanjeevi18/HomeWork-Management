@@ -17,7 +17,7 @@ class OnboardingController extends GetxController {
   Future<void> loadOnboardingData() async {
     try {
       final String jsonString = await rootBundle.loadString(
-        'assets/Kids Learning From Home.json',
+        'assets/onboarding_data.json',
       );
       final Map<String, dynamic> jsonData = json.decode(jsonString);
 
@@ -27,63 +27,46 @@ class OnboardingController extends GetxController {
           jsonData['onboarding'],
         );
       } else {
-        // Default onboarding data if JSON doesn't have it
-        onboardingData.value = [
-          {
-            "title": "Manage Your Homework",
-            "description":
-                "Keep track of all your assignments and never miss a deadline again.",
-            "image": "assets/images/homework1.png",
-          },
-          {
-            "title": "Stay Organized",
-            "description":
-                "Organize your tasks by subject and priority to boost your productivity.",
-            "image": "assets/images/homework2.png",
-          },
-          {
-            "title": "Track Progress",
-            "description":
-                "Monitor your progress and celebrate your achievements.",
-            "image": "assets/images/homework3.png",
-          },
-          {
-            "title": "Get Started",
-            "description":
-                "Ready to take control of your homework? Let's begin!",
-            "image": "assets/images/homework4.png",
-          },
-        ];
+        _setDefaultOnboardingData();
       }
     } catch (e) {
       print('Error loading onboarding data: $e');
-      // Use default data if JSON loading fails
-      onboardingData.value = [
-        {
-          "title": "Manage Your Homework",
-          "description":
-              "Keep track of all your assignments and never miss a deadline again.",
-          "image": "assets/images/homework1.png",
-        },
-        {
-          "title": "Stay Organized",
-          "description":
-              "Organize your tasks by subject and priority to boost your productivity.",
-          "image": "assets/images/homework2.png",
-        },
-        {
-          "title": "Track Progress",
-          "description":
-              "Monitor your progress and celebrate your achievements.",
-          "image": "assets/images/homework3.png",
-        },
-        {
-          "title": "Get Started",
-          "description": "Ready to take control of your homework? Let's begin!",
-          "image": "assets/images/homework4.png",
-        },
-      ];
+      _setDefaultOnboardingData();
     }
+  }
+
+  void _setDefaultOnboardingData() {
+    onboardingData.value = [
+      {
+        "title": "Welcome to Homework Manager",
+        "description":
+            "Your personal homework assistant that helps you stay organized and never miss a deadline again.",
+        "icon": "school",
+        "isAnimated": true,
+      },
+      {
+        "title": "Stay Organized",
+        "description":
+            "Organize your assignments by subject, priority, and due dates to boost your productivity.",
+        "icon": "folder_special",
+        "isAnimated": false,
+      },
+      {
+        "title": "Track Your Progress",
+        "description":
+            "Monitor your completion rates and celebrate your achievements with visual progress indicators.",
+        "icon": "analytics",
+        "isAnimated": false,
+      },
+      {
+        "title": "Ready to Get Started?",
+        "description":
+            "Join thousands of students who have transformed their homework management. Let's begin your journey!",
+        "icon": "rocket_launch",
+        "isAnimated": false,
+        "isGetStarted": true,
+      },
+    ];
   }
 
   void nextPage() {

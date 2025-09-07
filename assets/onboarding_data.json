@@ -1,0 +1,33 @@
+{
+  "onboarding": [
+    {
+      "title": "Welcome to Homework Manager",
+      "description": "Your personal homework assistant that helps you stay organized and never miss a deadline again.",
+      "image": "assets/images/welcome.png",
+      "icon": "school",
+      "isAnimated": true
+    },
+    {
+      "title": "Stay Organized",
+      "description": "Organize your assignments by subject, priority, and due dates to boost your productivity.",
+      "image": "assets/images/organize.png",
+      "icon": "folder_special",
+      "isAnimated": false
+    },
+    {
+      "title": "Track Your Progress",
+      "description": "Monitor your completion rates and celebrate your achievements with visual progress indicators.",
+      "image": "assets/images/progress.png",
+      "icon": "analytics",
+      "isAnimated": false
+    },
+    {
+      "title": "Ready to Get Started?",
+      "description": "Join thousands of students who have transformed their homework management. Let's begin your journey!",
+      "image": "assets/images/start.png",
+      "icon": "rocket_launch",
+      "isAnimated": false,
+      "isGetStarted": true
+    }
+  ]
+}

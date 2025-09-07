@@ -12,23 +12,23 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Check if onboarding is completed
-    if (!isOnboardingCompleted) {
-      Get.offAllNamed('/onboarding');
-    } else {
-      // Listen to auth state changes
-      firebaseUser.bindStream(_auth.authStateChanges());
-      ever(firebaseUser, _setInitialScreen);
-    }
+    // Listen to auth state changes
+    firebaseUser.bindStream(_auth.authStateChanges());
+    ever(firebaseUser, _setInitialScreen);
   }
 
   bool get isOnboardingCompleted => box.read('onboarding_completed') ?? false;
 
   _setInitialScreen(User? user) {
-    if (user == null) {
-      Get.offAllNamed('/login');
-    } else {
-      Get.offAllNamed('/home');
+    // Only navigate if onboarding is completed and we're not already on the correct screen
+    if (isOnboardingCompleted) {
+      final currentRoute = Get.currentRoute;
+
+      if (user == null && currentRoute != '/login') {
+        Get.offAllNamed('/login');
+      } else if (user != null && currentRoute != '/home') {
+        Get.offAllNamed('/home');
+      }
     }
   }
 

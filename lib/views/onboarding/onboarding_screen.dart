@@ -4,6 +4,7 @@ import '../../controllers/onboarding_controller.dart';
 
 class OnboardingScreen extends StatelessWidget {
   final OnboardingController controller = Get.put(OnboardingController());
+  final PageController pageController = PageController();
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +18,7 @@ class OnboardingScreen extends StatelessWidget {
           return Stack(
             children: [
               PageView.builder(
+                controller: pageController,
                 onPageChanged: (index) => controller.goToPage(index),
                 itemCount: controller.onboardingData.length,
                 itemBuilder: (context, index) {
@@ -24,9 +26,18 @@ class OnboardingScreen extends StatelessWidget {
                   return OnboardingPage(
                     title: data['title'] ?? '',
                     description: data['description'] ?? '',
-                    image: data['image'] ?? '',
+                    icon: data['icon'] ?? 'school',
+                    isAnimated: data['isAnimated'] ?? false,
                     isLast: index == controller.onboardingData.length - 1,
-                    onNext: () => controller.nextPage(),
+                    isGetStarted: data['isGetStarted'] ?? false,
+                    onNext: () {
+                      if (index < controller.onboardingData.length - 1) {
+                        pageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    },
                     onFinish: () => controller.finishOnboarding(),
                   );
                 },
@@ -45,6 +56,7 @@ class OnboardingScreen extends StatelessWidget {
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
                         fontSize: 16,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -52,16 +64,17 @@ class OnboardingScreen extends StatelessWidget {
 
               // Page indicators
               Positioned(
-                bottom: 80,
+                bottom: 100,
                 left: 0,
                 right: 0,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
                     controller.onboardingData.length,
-                    (index) => Container(
+                    (index) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
                       margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: controller.currentPage.value == index ? 12 : 8,
+                      width: controller.currentPage.value == index ? 20 : 8,
                       height: 8,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
@@ -81,11 +94,13 @@ class OnboardingScreen extends StatelessWidget {
   }
 }
 
-class OnboardingPage extends StatelessWidget {
+class OnboardingPage extends StatefulWidget {
   final String title;
   final String description;
-  final String image;
+  final String icon;
+  final bool isAnimated;
   final bool isLast;
+  final bool isGetStarted;
   final VoidCallback onNext;
   final VoidCallback onFinish;
 
@@ -93,74 +108,177 @@ class OnboardingPage extends StatelessWidget {
     Key? key,
     required this.title,
     required this.description,
-    required this.image,
+    required this.icon,
+    required this.isAnimated,
     required this.isLast,
+    required this.isGetStarted,
     required this.onNext,
     required this.onFinish,
   }) : super(key: key);
 
   @override
+  State<OnboardingPage> createState() => _OnboardingPageState();
+}
+
+class _OnboardingPageState extends State<OnboardingPage>
+    with TickerProviderStateMixin {
+  late AnimationController _bounceController;
+  late AnimationController _fadeController;
+  late Animation<double> _bounceAnimation;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _bounceController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+
+    _bounceAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _bounceController, curve: Curves.elasticOut),
+    );
+
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeIn));
+
+    // Start animations
+    _fadeController.forward();
+    if (widget.isAnimated) {
+      _bounceController.repeat(reverse: true);
+    } else {
+      _bounceController.forward();
+    }
+  }
+
+  @override
+  void dispose() {
+    _bounceController.dispose();
+    _fadeController.dispose();
+    super.dispose();
+  }
+
+  IconData _getIconData(String iconName) {
+    switch (iconName) {
+      case 'school':
+        return Icons.school;
+      case 'folder_special':
+        return Icons.folder_special;
+      case 'analytics':
+        return Icons.analytics;
+      case 'rocket_launch':
+        return Icons.rocket_launch;
+      default:
+        return Icons.school;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Image placeholder (you can replace with actual images)
-          Container(
-            width: 250,
-            height: 250,
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(125),
-            ),
-            child: Icon(
-              Icons.school,
-              size: 120,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-
-          const SizedBox(height: 40),
-
-          Text(
-            title,
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.center,
-          ),
-
-          const SizedBox(height: 16),
-
-          Text(
-            description,
-            style: const TextStyle(fontSize: 16, color: Colors.grey),
-            textAlign: TextAlign.center,
-          ),
-
-          const SizedBox(height: 60),
-
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: isLast ? onFinish : onNext,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+      child: FadeTransition(
+        opacity: _fadeAnimation,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Animated Icon
+            ScaleTransition(
+              scale: _bounceAnimation,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  _getIconData(widget.icon),
+                  size: 100,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
+            ),
+
+            const SizedBox(height: 60),
+
+            // Title with slide animation
+            SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.3),
+                end: Offset.zero,
+              ).animate(_fadeController),
               child: Text(
-                isLast ? 'Get Started' : 'Next',
+                widget.title,
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+            const SizedBox(height: 24),
+
+            // Description with slide animation
+            SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.5),
+                end: Offset.zero,
+              ).animate(_fadeController),
+              child: Text(
+                widget.description,
                 style: const TextStyle(
                   fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
+                  height: 1.5,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
+            const SizedBox(height: 80),
+
+            // Action Button
+            SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.7),
+                end: Offset.zero,
+              ).animate(_fadeController),
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: widget.isLast ? widget.onFinish : widget.onNext,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 2,
+                  ),
+                  child: Text(
+                    widget.isGetStarted ? 'Get Started 🚀' : 'Next',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

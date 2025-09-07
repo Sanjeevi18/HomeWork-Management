@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:get_storage/get_storage.dart';
 import 'app/routes.dart';
 import 'app/themes.dart';
-import 'controllers/auth_controller.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -15,9 +14,6 @@ void main() async {
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  // Initialize GetX controllers
-  Get.put(AuthController());
 
   runApp(const MyApp());
 }

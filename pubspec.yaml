@@ -27,4 +27,4 @@ flutter:
   assets:
     - assets/
     - assets/images/
-    - assets/Kids Learning From Home.json
+    - assets/onboarding_data.json

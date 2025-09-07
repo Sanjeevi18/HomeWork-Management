@@ -30,21 +30,23 @@ The app features a calming and student-friendly color palette:
 ### 📱 User Interface Features
 
 - **Responsive Design**: Works on all screen sizes
-- **Dark/Light Theme**: Automatic system theme detection
+- **Dark/Light Theme**: Automatic system theme detection with calming color palette
 - **Smooth Animations**: Card transitions and loading states
 - **Intuitive Navigation**: GetX-powered routing
 - **Form Validation**: Email and password validation
 - **Snackbar Notifications**: User feedback for actions
+- **Bottom Sheet UI**: Modern material design for adding homework
 
 ### 🔧 Technical Features
 
 - **State Management**: GetX for reactive programming
 - **Local Storage**: GetStorage for user preferences
 - **Firebase Integration**:
-  - Firestore for data storage
-  - Firebase Auth for authentication
+  - Firestore for real-time data storage
+  - Firebase Auth for secure authentication
 - **Clean Architecture**: MVC pattern implementation
 - **Code Organization**: Modular folder structure
+- **Error Handling**: Comprehensive error handling with user feedback
 
 ## 🏗️ Project Structure
 
