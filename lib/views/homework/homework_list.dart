@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/homework_controller.dart';
+import 'add_homework_bottomsheet.dart';
 
 class HomeworkListScreen extends StatelessWidget {
   final AuthController authController = Get.find();
@@ -132,10 +133,11 @@ class HomeworkListScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // TODO: Show add homework bottom sheet
-          Get.snackbar(
-            'Coming Soon',
-            'Add homework feature will be implemented',
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => AddHomeworkBottomSheet(),
           );
         },
         child: const Icon(Icons.add),

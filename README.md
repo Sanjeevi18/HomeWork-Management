@@ -88,7 +88,6 @@ lib/
 - `flutter_slidable: ^3.0.1`: Swipe actions for homework items
 - `get_storage: ^2.1.1`: Local data persistence
 - `intl: ^0.19.0`: Date formatting and internationalization
-- `flutter_local_notifications: ^16.3.2`: Push notifications
 
 ## 🚀 Getting Started
 
